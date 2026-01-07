@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Restaurante</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .nav-link.active {
+            background: rgba(255,255,255,0.25);
+            color: white;
+        }
+
+        .nav-logout {
+            background: rgba(239, 68, 68, 0.9);
+        }
+
+        .nav-logout:hover {
+            background: rgba(239, 68, 68, 1);
+        }
+
+        .nav-user {
+            color: white;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.15);
+            border-radius: 0.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Alert */
+        .alert {
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            position: relative;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+
+        .alert-close {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.5;
+        }
+
+        .alert-close:hover {
+            opacity: 1;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Dashboard Header */
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: #1e293b;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        /* Sección de Accesos Rápidos */
+        .quick-access-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #667eea;
+            display: inline-block;
+        }
+
+        .quick-access-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .quick-access-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            text-decoration: none;
+            color: #1e293b;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quick-access-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            border-color: #667eea;
+        }
+
+        .quick-access-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .quick-access-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+
+        .quick-access-desc {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        /* Badge de notificación */
+        .notification-badge {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Colores para diferentes tipos de accesos */
+        .qa-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white !important; }
+        .qa-primary .quick-access-title,
+        .qa-primary .quick-access-desc { color: white !important; }
+
+        .qa-success { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white !important; }
+        .qa-success .quick-access-title,
+        .qa-success .quick-access-desc { color: white !important; }
+
+        .qa-warning { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white !important; }
+        .qa-warning .quick-access-title,
+        .qa-warning .quick-access-desc { color: white !important; }
+
+        .qa-danger { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white !important; }
+        .qa-danger .quick-access-title,
+        .qa-danger .quick-access-desc { color: white !important; }
+
+        .qa-info { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); color: white !important; }
+        .qa-info .quick-access-title,
+        .qa-info .quick-access-desc { color: white !important; }
+
+        .qa-purple { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white !important; }
+        .qa-purple .quick-access-title,
+        .qa-purple .quick-access-desc { color: white !important; }
+
+        /* Divider */
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+            margin: 2rem 0;
+        }
+
+        /* Mesas Grid */
+        .mesas-section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .mesas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .mesa-card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .mesa-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .mesa-card.mesa-ocupada {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .mesa-card.mesa-libre {
+            border-left: 4px solid #10b981;
+        }
+
+        .mesa-card.mesa-completa {
+            border-left: 4px solid #06b6d4;
+        }
+
+        .mesa-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .mesa-header h3 {
+            font-size: 1.3rem;
+            color: #1e293b;
+        }
+
+        .mesa-info-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.85rem;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-label {
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .sesion-tiempo {
+            background: #f1f5f9;
+            padding: 0.35rem 0.6rem;
+            border-radius: 0.4rem;
+            font-size: 0.75rem;
+            color: #64748b;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .badge {
+            padding: 0.35rem 0.85rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-secondary {
+            background: #e2e8f0;
+            color: #64748b;
+        }
+
+        .mesa-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.4rem;
+            margin-top: 0.75rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 0.75rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-block {
+            grid-column: 1 / -1;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #64748b;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: #64748b;
+        }
+
+        .empty-state h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .dashboard-header h1 {
+                font-size: 2rem;
+            }
+
+            .quick-access-grid {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            }
+
+            .mesas-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .mesa-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">Ivaluth Manager</div>
+
+            <div class="nav-menu">
+                <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+
+                {% if current_user.rol == 'cocina' %}
+                    <a href="{{ url_for('cocina') }}" class="nav-link">📋 Cocina</a>
+                    <a href="{{ url_for('lista_domicilios') }}" class="nav-link">📦 Domicilios</a>
+
+                {% else %}
+                    <a href="{{ url_for('historial') }}" class="nav-link">📊 Historial</a>
+                    <a href="{{ url_for('lista_facturas') }}" class="nav-link">🧾 Facturas</a>
+                    <a href="{{ url_for('lista_domicilios') }}" class="nav-link">📦 Domicilios</a>
+                    <a href="{{ url_for('nuevo_domicilio') }}" class="nav-link">➕ Nuevo Domicilio</a>
+                {% endif %}
+
+                {% if current_user.rol == 'admin' %}
+                    <a href="{{ url_for('lista_gastos') }}" class="nav-link">💰 Gastos</a>
+                    <a href="{{ url_for('reporte_financiero') }}" class="nav-link">📈 Reportes</a>
+                    <a href="{{ url_for('administrar_menu') }}" class="nav-link">🍴 Menú</a>
+                    <a href="{{ url_for('administrar_mesas') }}" class="nav-link">🪑 Mesas</a>
+                    <a href="{{ url_for('administrar_usuarios') }}" class="nav-link">👥 Usuarios</a>
+                    <a href="{{ url_for('configuracion_restaurante') }}" class="nav-link">⚙️ Config</a>
+                {% endif %}
+
+                <span class="nav-user">
+                    👤 {{ current_user.nombre }} ({{ current_user.rol|title }})
+                </span>
+
+                <a href="{{ url_for('logout') }}" class="nav-link nav-logout">Salir</a>
+            </div>
+        </div>
+    </nav>
+
+
+    <div class="container">
+        <!-- Alerts -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                    <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <h1>Panel de Control</h1>
+            <p class="subtitle">
+                Hoy: {{ now.strftime('%d/%m/%Y') if now else '' }} | 
+                {% if current_user.rol == 'admin' %}Administrador{% elif current_user.rol == 'mesero' %}Mesero{% else %}Cocina{% endif %}
+            </p>
+        </div>
+
+        <!-- SECCIÓN: Accesos Rápidos para ADMINISTRADORES -->
+        {% if current_user.rol == 'admin' %}
+        
+        <!-- Control Financiero -->
+        <div class="quick-access-section">
+            <h2 class="section-title">💰 Control Financiero</h2>
+            <div class="quick-access-grid">
+                <a href="{{ url_for('cuentas_por_pagar') }}" class="quick-access-card qa-danger">
+                    <div class="quick-access-icon">💳</div>
+                    <div class="quick-access-title">Cuentas por Pagar</div>
+                    <div class="quick-access-desc">Deudas con proveedores</div>
+                </a>
+
+                <a href="{{ url_for('cuentas_por_cobrar') }}" class="quick-access-card qa-success">
+                    <div class="quick-access-icon">💵</div>
+                    <div class="quick-access-title">Cuentas por Cobrar</div>
+                    <div class="quick-access-desc">Deudas de clientes</div>
+                </a>
+
+                <a href="{{ url_for('lista_presupuestos') }}" class="quick-access-card qa-warning">
+                    <div class="quick-access-icon">🎯</div>
+                    <div class="quick-access-title">Presupuestos</div>
+                    <div class="quick-access-desc">Límites de gasto</div>
+                </a>
+
+                <a href="{{ url_for('reporte_financiero') }}" class="quick-access-card qa-info">
+                    <div class="quick-access-icon">📊</div>
+                    <div class="quick-access-title">Reporte Financiero</div>
+                    <div class="quick-access-desc">Ingresos vs Gastos</div>
+                </a>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Gestión de Gastos e Ingresos -->
+        <div class="quick-access-section">
+            <h2 class="section-title">💸 Gestión de Gastos e Ingresos</h2>
+            <div class="quick-access-grid">
+                <a href="{{ url_for('lista_gastos') }}" class="quick-access-card qa-danger">
+                    <div class="quick-access-icon">💸</div>
+                    <div class="quick-access-title">Gestión de Gastos</div>
+                    <div class="quick-access-desc">Registrar y consultar egresos</div>
+                </a>
+
+                <a href="{{ url_for('lista_proveedores') }}" class="quick-access-card">
+                    <div class="quick-access-icon">🏢</div>
+                    <div class="quick-access-title">Proveedores</div>
+                    <div class="quick-access-desc">Base de datos de proveedores</div>
+                </a>
+
+                <a href="{{ url_for('lista_facturas') }}" class="quick-access-card qa-info">
+                    <div class="quick-access-icon">🧾</div>
+                    <div class="quick-access-title">Facturas</div>
+                    <div class="quick-access-desc">Consultar facturas emitidas</div>
+                </a>
+
+                <a href="{{ url_for('historial') }}" class="quick-access-card qa-warning">
+                    <div class="quick-access-icon">📊</div>
+                    <div class="quick-access-title">Historial</div>
+                    <div class="quick-access-desc">Ver sesiones y ventas</div>
+                </a>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Configuración del Restaurante -->
+        <div class="quick-access-section">
+            <h2 class="section-title">⚙️ Configuración del Restaurante</h2>
+            <div class="quick-access-grid">
+                <a href="{{ url_for('administrar_menu') }}" class="quick-access-card qa-purple">
+                    <div class="quick-access-icon">🍴</div>
+                    <div class="quick-access-title">Gestionar Menú</div>
+                    <div class="quick-access-desc">Editar platillos y precios</div>
+                </a>
+
+                <a href="{{ url_for('administrar_mesas') }}" class="quick-access-card">
+                    <div class="quick-access-icon">🪑</div>
+                    <div class="quick-access-title">Gestionar Mesas</div>
+                    <div class="quick-access-desc">Configurar mesas</div>
+                </a>
+
+                <a href="{{ url_for('lista_consumos_internos') }}" class="quick-access-card qa-danger">
+                    <div class="quick-access-icon">🍽️</div>
+                    <div class="quick-access-title">Consumo Interno</div>
+                    <div class="quick-access-desc">Registrar artículos retirados para uso interno</div>
+                </a>
+
+                <a href="{{ url_for('administrar_usuarios') }}" class="quick-access-card">
+                    <div class="quick-access-icon">👥</div>
+                    <div class="quick-access-title">Usuarios</div>
+                    <div class="quick-access-desc">Gestionar empleados</div>
+                </a>
+
+                <a href="{{ url_for('configuracion_restaurante') }}" class="quick-access-card">
+                    <div class="quick-access-icon">⚙️</div>
+                    <div class="quick-access-title">Configuración</div>
+                    <div class="quick-access-desc">Datos del restaurante</div>
+                </a>
+
+                <a href="{{ url_for('menu_publico') }}" class="quick-access-card qa-primary" target="_blank">
+                    <div class="quick-access-icon">📱</div>
+                    <div class="quick-access-title">Menú Público</div>
+                    <div class="quick-access-desc">Ver menú de clientes</div>
+                </a>
+                
+            </div>
+        </div>
+
+        <div class="divider"></div>
+        {% endif %}
+
+        <!-- SECCIÓN: Accesos Rápidos para MESEROS -->
+        {% if current_user.rol == 'mesero' %}
+        <div class="quick-access-section">
+            <h2 class="section-title">🎯 Accesos Rápidos - Mesero</h2>
+            <div class="quick-access-grid">
+                <a href="{{ url_for('historial') }}" class="quick-access-card qa-warning">
+                    <div class="quick-access-icon">📊</div>
+                    <div class="quick-access-title">Historial</div>
+                    <div class="quick-access-desc">Ver sesiones del día</div>
+                </a>
+
+                <a href="{{ url_for('lista_facturas') }}" class="quick-access-card qa-info">
+                    <div class="quick-access-icon">🧾</div>
+                    <div class="quick-access-title">Facturas</div>
+                    <div class="quick-access-desc">Consultar facturas</div>
+                </a>
+
+                <a href="{{ url_for('menu_publico') }}" class="quick-access-card qa-primary" target="_blank">
+                    <div class="quick-access-icon">📱</div>
+                    <div class="quick-access-title">Ver Menú</div>
+                    <div class="quick-access-desc">Consultar platillos</div>
+                </a>
+
+                <a href="{{ url_for('cocina') }}" class="quick-access-card qa-success">
+                    <div class="quick-access-icon">👨‍🍳</div>
+                    <div class="quick-access-title">Estado Cocina</div>
+                    <div class="quick-access-desc">Ver pedidos en preparación</div>
+                </a>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+        {% endif %}
+
+        <!-- SECCIÓN: Accesos Rápidos para COCINA -->
+        {% if current_user.rol == 'cocina' %}
+        <div class="quick-access-section">
+            <h2 class="section-title">🎯 Accesos Rápidos - Cocina</h2>
+            <div class="quick-access-grid">
+                <a href="{{ url_for('cocina') }}" class="quick-access-card qa-primary">
+                    <div class="quick-access-icon">👨‍🍳</div>
+                    <div class="quick-access-title">Panel de Cocina</div>
+                    <div class="quick-access-desc">Ver pedidos pendientes</div>
+                </a>
+
+                <a href="{{ url_for('menu_publico') }}" class="quick-access-card qa-success" target="_blank">
+                    <div class="quick-access-icon">📱</div>
+                    <div class="quick-access-title">Ver Menú</div>
+                    <div class="quick-access-desc">Consultar platillos</div>
+                </a>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+        {% endif %}
+
+        <!-- SECCIÓN: Mesas del Restaurante (para Admin y Meseros) -->
+        {% if current_user.rol != 'cocina' %}
+        <div class="mesas-section-title">🪑 Estado de las Mesas</div>
+        
+        <div class="mesas-grid">
+            {% for mesa in mesas %}
+            {% set info = info_mesas[mesa.id] %}
+            <div class="mesa-card 
+                {% if info.sesion %}
+                    {% if info.todos_entregados and not info.tiene_pendientes %}
+                        mesa-completa
+                    {% else %}
+                        mesa-ocupada
+                    {% endif %}
+                {% else %}
+                    mesa-libre
+                {% endif %}">
+                <div class="mesa-header">
+                    <h3>Mesa {{ mesa.numero }}</h3>
+                    {% if info.sesion %}
+                        {% if info.todos_entregados and not info.tiene_pendientes %}
+                        <span class="badge badge-info">Listo</span>
+                        {% elif info.tiene_pendientes %}
+                        <span class="badge badge-warning">Activa</span>
+                        {% else %}
+                        <span class="badge badge-success">Pagado</span>
+                        {% endif %}
+                    {% else %}
+                    <span class="badge badge-secondary">Libre</span>
+                    {% endif %}
+                </div>
+                
+                {% if info.sesion %}
+                <div class="sesion-tiempo">
+                    ⏰ Desde {{ info.hora_inicio }}
+                </div>
+                
+                <div class="mesa-info-compact">
+                    <div class="info-row">
+                        <span class="info-label">Pedidos:</span>
+                        <span class="info-value">{{ info.total_pedidos }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Pendientes:</span>
+                        <span class="info-value">
+                            {% if info.tiene_pendientes %}
+                            {{ info.pedidos|selectattr('pagado', 'equalto', False)|list|length }} 💰
+                            {% else %}
+                            0 ✓
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="mesa-actions">
+                    <a href="{{ url_for('nuevo_pedido', mesa_id=mesa.id) }}" class="btn btn-primary btn-sm">+ Pedido</a>
+                    <a href="{{ url_for('ver_mesa', mesa_id=mesa.id) }}" class="btn btn-secondary btn-sm">Ver</a>
+                    {% if info.sesion %}
+                        {% if info.tiene_pendientes %}
+                        <a href="{{ url_for('pagar_mesa', mesa_id=mesa.id) }}" 
+                           class="btn btn-success btn-sm btn-block" 
+                           onclick="return confirm('¿Marcar todo como pagado?')">💰 Pagar Todo</a>
+                        {% elif info.todos_entregados %}
+                        <a href="{{ url_for('facturar_sesion', sesion_id=info.sesion.id) }}" 
+                           class="btn btn-info btn-sm btn-block" 
+                           style="background: #06b6d4;">🧾 Facturar</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if not mesas %}
+        <div class="empty-state">
+            <h2>No hay mesas disponibles</h2>
+            <p>Configura las mesas desde el panel de administración</p>
+            {% if current_user.rol == 'admin' %}
+            <a href="{{ url_for('administrar_mesas') }}" class="btn btn-primary" style="margin-top: 1rem; display: inline-block;">
+                Configurar Mesas
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% endif %}
+    </div>
+
+    <script>
+        // Auto-hide alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    alert.style.transform = 'translateY(-10px)';
+                    setTimeout(() => alert.remove(), 300);
+                }, 5000);
+            });
+        });
+
+        // Refresh automático cada 30 segundos para actualizar estado de mesas
+        {% if current_user.rol != 'cocina' %}
+        setTimeout(function() {
+            location.reload();
+        }, 30000);
+        {% endif %}
+    </script>
+</body>
+</html>
