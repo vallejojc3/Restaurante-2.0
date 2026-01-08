@@ -7,6 +7,22 @@ import os
 import json
 from sqlalchemy.exc import OperationalError
 from dotenv import load_dotenv
+import sys
+import logging
+
+# Configurar logging detallado
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+logger = logging.getLogger(__name__)
+
+logger.info("Iniciando aplicación Flask...")
+
+
 
 # Cargar .env en desarrollo si existe
 if os.path.exists('.env'):
@@ -36,6 +52,12 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+
+@app.route('/health')
+def health_check():
+    """Health check para Railway"""
+    return {'status': 'ok', 'message': 'App is running'}, 200
 
 # =========================
 # MODELOS
@@ -111,6 +133,8 @@ class ItemMenu(db.Model):
     disponible = db.Column(db.Boolean, default=True)
     imagen_url = db.Column(db.String(500))
     orden = db.Column(db.Integer, default=0)
+
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -3292,11 +3316,7 @@ def api_calcular_costo_zona():
 
 if __name__ == "__main__":
     init_db()
-
-# POR:
-if __name__ == "__main__":
-    init_db()
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)
 else:
     # En producción (Railway), inicializar automáticamente
     with app.app_context():
@@ -3309,7 +3329,21 @@ else:
                 admin = Usuario(username='admin', nombre='Administrador', rol='admin')
                 admin.set_password('admin123')
                 db.session.add(admin)
+                
+                # Crear otros usuarios por defecto
+                mesero = Usuario(username='mesero1', nombre='Mesero 1', rol='mesero')
+                mesero.set_password('mesero123')
+                db.session.add(mesero)
+                
+                cocina = Usuario(username='cocina', nombre='Cocina', rol='cocina')
+                cocina.set_password('cocina123')
+                db.session.add(cocina)
+                
                 db.session.commit()
-                print("✅ Usuario admin creado")
+                print("✅ Usuarios por defecto creados")
+            else:
+                print("ℹ️ Usuarios ya existen")
+                
         except Exception as e:
             print(f"⚠️ Error en inicialización: {e}")
+            # No hacer rollback aquí, dejar que la app arranque de todos modos
