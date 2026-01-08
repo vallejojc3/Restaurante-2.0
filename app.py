@@ -3289,6 +3289,27 @@ def api_calcular_costo_zona():
     # =========================
     # EJECUCIÓN
     # =========================
+
 if __name__ == "__main__":
     init_db()
-    
+
+# POR:
+if __name__ == "__main__":
+    init_db()
+    app.run(debug=True)
+else:
+    # En producción (Railway), inicializar automáticamente
+    with app.app_context():
+        try:
+            db.create_all()
+            print("✅ Tablas creadas/verificadas")
+            
+            # Crear admin si no existe
+            if not Usuario.query.filter_by(username='admin').first():
+                admin = Usuario(username='admin', nombre='Administrador', rol='admin')
+                admin.set_password('admin123')
+                db.session.add(admin)
+                db.session.commit()
+                print("✅ Usuario admin creado")
+        except Exception as e:
+            print(f"⚠️ Error en inicialización: {e}")
