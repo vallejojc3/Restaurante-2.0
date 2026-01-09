@@ -3307,35 +3307,32 @@ def api_calcular_costo_zona():
         'tiempo_estimado': 30
     })
 
-@app.route("/init_categories_secret_2025")
+@app.route("/crear_categorias_ahora")
 @login_required
-def init_categories_secret():
-    """Ruta temporal para inicializar categorías en Railway"""
+def crear_categorias_ahora():
     if current_user.rol != 'admin':
         return "No autorizado", 403
     
-    if CategoriaGasto.query.count() > 0:
-        return f"Ya existen {CategoriaGasto.query.count()} categorías. No se crearon nuevas."
+    total = CategoriaGasto.query.count()
+    if total > 0:
+        return f"Ya hay {total} categorías"
     
-    categorias_default = [
-        {'nombre': 'Ingredientes y Materia Prima', 'descripcion': 'Compras de alimentos, bebidas y suministros de cocina', 'color': '#28a745'},
-        {'nombre': 'Salarios y Nómina', 'descripcion': 'Pagos a empleados, prestaciones y seguridad social', 'color': '#007bff'},
-        {'nombre': 'Servicios Públicos', 'descripcion': 'Agua, luz, gas, internet, teléfono', 'color': '#ffc107'},
-        {'nombre': 'Arriendo', 'descripcion': 'Pago de arriendo del local', 'color': '#dc3545'},
-        {'nombre': 'Mantenimiento', 'descripcion': 'Reparaciones, limpieza, mantenimiento de equipos', 'color': '#6c757d'},
-        {'nombre': 'Marketing', 'descripcion': 'Publicidad, redes sociales, volantes', 'color': '#e83e8c'},
-        {'nombre': 'Impuestos', 'descripcion': 'Impuestos, declaraciones, trámites legales', 'color': '#fd7e14'},
-        {'nombre': 'Otros Gastos', 'descripcion': 'Gastos misceláneos', 'color': '#6610f2'}
+    categorias = [
+        {'nombre': 'Ingredientes y Materia Prima', 'color': '#28a745'},
+        {'nombre': 'Salarios y Nómina', 'color': '#007bff'},
+        {'nombre': 'Servicios Públicos', 'color': '#ffc107'},
+        {'nombre': 'Arriendo', 'color': '#dc3545'},
+        {'nombre': 'Mantenimiento', 'color': '#6c757d'},
+        {'nombre': 'Marketing', 'color': '#e83e8c'},
+        {'nombre': 'Impuestos', 'color': '#fd7e14'},
+        {'nombre': 'Otros Gastos', 'color': '#6610f2'}
     ]
     
-    for cat_data in categorias_default:
-        categoria = CategoriaGasto(**cat_data)
-        db.session.add(categoria)
+    for c in categorias:
+        db.session.add(CategoriaGasto(**c))
     
     db.session.commit()
-    
-    return "✅ 8 categorías creadas exitosamente! Ahora puedes eliminar esta ruta del código."
-
+    return "✅ 8 categorías creadas!"
 
     # =========================
     # EJECUCIÓN
