@@ -3333,7 +3333,6 @@ def crear_categorias_ahora():
     
     db.session.commit()
     return "✅ 8 categorías creadas!"
-
     # =========================
     # EJECUCIÓN
     # =========================
