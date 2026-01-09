@@ -274,6 +274,49 @@
             margin: 2rem 0;
         }
 
+        /* Leyenda de Estados */
+        .estados-leyenda {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .estados-leyenda h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: #1e293b;
+            font-weight: 700;
+        }
+
+        .leyenda-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .leyenda-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .leyenda-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 0.25rem;
+            border: 2px solid rgba(0,0,0,0.1);
+        }
+
+        .color-libre { background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); }
+        .color-pendiente { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); }
+        .color-preparando { background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%); }
+        .color-listo { background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%); }
+        .color-entregado { background: linear-gradient(135deg, #86efac 0%, #4ade80 100%); }
+
         /* Mesas Grid */
         .mesas-section-title {
             font-size: 1.5rem;
@@ -296,6 +339,7 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             transition: all 0.3s;
             border: 2px solid transparent;
+            position: relative;
         }
 
         .mesa-card:hover {
@@ -303,16 +347,54 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.15);
         }
 
-        .mesa-card.mesa-ocupada {
-            border-left: 4px solid #f59e0b;
-        }
-
+        /* ESTADOS DE COCINA CON COLORES DISTINTOS */
+        
+        /* Mesa libre - Verde suave */
         .mesa-card.mesa-libre {
-            border-left: 4px solid #10b981;
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-left: 5px solid #10b981;
         }
 
-        .mesa-card.mesa-completa {
-            border-left: 4px solid #06b6d4;
+        /* Pedidos pendientes - Amarillo */
+        .mesa-card.mesa-pendiente {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 5px solid #eab308;
+            animation: pulseYellow 2s infinite;
+        }
+
+        @keyframes pulseYellow {
+            0%, 100% { box-shadow: 0 2px 8px rgba(234, 179, 8, 0.3); }
+            50% { box-shadow: 0 4px 16px rgba(234, 179, 8, 0.5); }
+        }
+
+        /* Pedidos en preparación - Azul */
+        .mesa-card.mesa-preparando {
+            background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%);
+            border-left: 5px solid #3b82f6;
+            animation: pulseBlue 2s infinite;
+        }
+
+        @keyframes pulseBlue {
+            0%, 100% { box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3); }
+            50% { box-shadow: 0 4px 16px rgba(59, 130, 246, 0.6); }
+        }
+
+        /* Pedidos listos - Naranja/Rojo */
+        .mesa-card.mesa-listo {
+            background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+            border-left: 5px solid #f97316;
+            animation: pulseOrange 1.5s infinite;
+        }
+
+        @keyframes pulseOrange {
+            0%, 100% { box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3); }
+            50% { box-shadow: 0 4px 16px rgba(249, 115, 22, 0.6); }
+        }
+
+        /* Todos entregados - Verde intenso */
+        .mesa-card.mesa-entregado {
+            background: linear-gradient(135deg, #86efac 0%, #4ade80 100%);
+            border-left: 5px solid #16a34a;
         }
 
         .mesa-header {
@@ -321,7 +403,7 @@
             align-items: center;
             margin-bottom: 0.75rem;
             padding-bottom: 0.75rem;
-            border-bottom: 2px solid #f1f5f9;
+            border-bottom: 2px solid rgba(0,0,0,0.1);
         }
 
         .mesa-header h3 {
@@ -344,23 +426,64 @@
         }
 
         .info-label {
-            color: #64748b;
-            font-weight: 500;
+            color: #475569;
+            font-weight: 600;
         }
 
         .info-value {
-            font-weight: 600;
+            font-weight: 700;
             color: #1e293b;
         }
 
         .sesion-tiempo {
-            background: #f1f5f9;
+            background: rgba(255,255,255,0.7);
             padding: 0.35rem 0.6rem;
             border-radius: 0.4rem;
             font-size: 0.75rem;
-            color: #64748b;
+            color: #475569;
             text-align: center;
             margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        /* Estado del pedido badge */
+        .estado-cocina-badge {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .estado-libre {
+            background: #10b981;
+            color: white;
+        }
+
+        .estado-pendiente {
+            background: #eab308;
+            color: white;
+        }
+
+        .estado-preparando {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .estado-listo {
+            background: #f97316;
+            color: white;
+        }
+
+        .estado-entregado {
+            background: #16a34a;
+            color: white;
         }
 
         .badge {
@@ -487,6 +610,10 @@
 
             .btn {
                 width: 100%;
+            }
+
+            .leyenda-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -723,34 +850,72 @@
 
         <!-- SECCIÓN: Mesas del Restaurante (para Admin y Meseros) -->
         {% if current_user.rol != 'cocina' %}
+        
+        <!-- Leyenda de Estados -->
+        <div class="estados-leyenda">
+            <h3>📊 Leyenda de Estados de Cocina</h3>
+            <div class="leyenda-grid">
+                <div class="leyenda-item">
+                    <div class="leyenda-color color-libre"></div>
+                    <span>🟢 Libre</span>
+                </div>
+                <div class="leyenda-item">
+                    <div class="leyenda-color color-pendiente"></div>
+                    <span>🟡 Pendiente</span>
+                </div>
+                <div class="leyenda-item">
+                    <div class="leyenda-color color-preparando"></div>
+                    <span>🔵 Preparando</span>
+                </div>
+                <div class="leyenda-item">
+                    <div class="leyenda-color color-listo"></div>
+                    <span>🟠 Listo para Servir</span>
+                </div>
+                <div class="leyenda-item">
+                    <div class="leyenda-color color-entregado"></div>
+                    <span>🟢 Entregado</span>
+                </div>
+            </div>
+        </div>
+
         <div class="mesas-section-title">🪑 Estado de las Mesas</div>
         
         <div class="mesas-grid">
             {% for mesa in mesas %}
             {% set info = info_mesas[mesa.id] %}
-            <div class="mesa-card 
-                {% if info.sesion %}
-                    {% if info.todos_entregados and not info.tiene_pendientes %}
-                        mesa-completa
-                    {% else %}
-                        mesa-ocupada
+            
+            {# Determinar el estado de cocina dominante #}
+            {% set estado_dominante = 'libre' %}
+            {% if info.sesion %}
+                {% set tiene_pendiente = info.pedidos|selectattr('estado', 'equalto', 'pendiente')|list|length > 0 %}
+                {% set tiene_preparando = info.pedidos|selectattr('estado', 'equalto', 'preparando')|list|length > 0 %}
+                {% set tiene_listo = info.pedidos|selectattr('estado', 'equalto', 'listo')|list|length > 0 %}
+                {% set todos_entregados = info.pedidos|selectattr('estado', 'equalto', 'entregado')|list|length == info.pedidos|length %}
+                
+                {% if tiene_listo %}
+                    {% set estado_dominante = 'listo' %}
+                {% elif tiene_preparando %}
+                    {% set estado_dominante = 'preparando' %}
+                {% elif tiene_pendiente %}
+                    {% set estado_dominante = 'pendiente' %}
+                {% elif todos_entregados %}
+                    {% set estado_dominante = 'entregado' %}
+                {% endif %}
+            {% endif %}
+
+            <div class="mesa-card mesa-{{ estado_dominante }}">
+                {# Badge de estado en la esquina #}
+                <span class="estado-cocina-badge estado-{{ estado_dominante }}">
+                    {% if estado_dominante == 'libre' %}✅ Libre
+                    {% elif estado_dominante == 'pendiente' %}⏳ Pendiente
+                    {% elif estado_dominante == 'preparando' %}👨‍🍳 Preparando
+                    {% elif estado_dominante == 'listo' %}🔔 Listo
+                    {% elif estado_dominante == 'entregado' %}✅ Entregado
                     {% endif %}
-                {% else %}
-                    mesa-libre
-                {% endif %}">
+                </span>
+
                 <div class="mesa-header">
                     <h3>Mesa {{ mesa.numero }}</h3>
-                    {% if info.sesion %}
-                        {% if info.todos_entregados and not info.tiene_pendientes %}
-                        <span class="badge badge-info">Listo</span>
-                        {% elif info.tiene_pendientes %}
-                        <span class="badge badge-warning">Activa</span>
-                        {% else %}
-                        <span class="badge badge-success">Pagado</span>
-                        {% endif %}
-                    {% else %}
-                    <span class="badge badge-secondary">Libre</span>
-                    {% endif %}
                 </div>
                 
                 {% if info.sesion %}
